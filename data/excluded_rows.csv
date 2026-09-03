@@ -1,0 +1,2 @@
+source_line,invoice_no,invoice_date,vendor_gstin,vendor_name_raw,vendor_name_canonical,category,state,description,taxable_amount_orig,gst_amount_orig,gst_rate,currency,taxable_amount_inr,gst_amount_inr,payment_status,payment_date,is_credit_note,standard_term_days,flags,exclusion_reason
+56,INV-2024-0041,2024-08-10,27AAGCP2345Q1Z9,PRECISION TOOLS INDIA,Precision Tools India,Tooling,Maharashtra,Site safety harness x20,12178.51,2192.13,0.18,INR,12178.51,2192.13,Paid,2024-10-10,False,30,,superseded_duplicate_of_line_66
