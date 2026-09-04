@@ -2,6 +2,9 @@
 Day 3 — deterministic query engine for the Bridgeline ledger.
 
 
+
+
+
 """
 from __future__ import annotations
 
@@ -192,6 +195,62 @@ def q8_data_quality_issues(df: pd.DataFrame, excluded_path: Path | None = None) 
     }
 
 
+
+# Q9 (custom): Total taxable amount (excl GST) across all vendors,
+# FY2024-25, net of credit notes
+
+def q9_total_taxable_spend(df: pd.DataFrame) -> dict:
+    scope = _in_fy(df)
+    total = scope["taxable_amount_inr"].fillna(0).sum()
+    return {
+        "answer": round(float(total), 2),
+        "row_count": len(scope),
+    }
+
+
+
+# Q10 (custom): Vendor(s) with the most overdue invoices BY COUNT
+
+def q10_most_overdue_by_count(df: pd.DataFrame) -> dict:
+    candidates = df[(df["payment_status"] == "Unpaid") & (~df["is_credit_note"])]
+    days_elapsed = (REPORTING_DATE - candidates["invoice_date"]).dt.days
+    overdue = candidates[days_elapsed > candidates["standard_term_days"]]
+    counts = overdue.groupby("vendor_name_canonical").size().sort_values(ascending=False)
+    top_count = counts.iloc[0]
+    winners = counts[counts == top_count].index.tolist()
+    return {
+        "answer_vendors": winners,
+        "count": int(top_count),
+        "all_counts": counts.to_dict(),
+    }
+
+
+# Q11 (custom): Average taxable amount for Raw Material category,
+# EXCLUDING credit notes (judgement call - see DECISIONS.md)
+
+def q11_avg_raw_material(df: pd.DataFrame) -> dict:
+    rm = df[(df["category"] == "Raw Material") & (~df["is_credit_note"])]
+    avg = rm["taxable_amount_inr"].mean()
+    return {
+        "answer": round(float(avg), 2),
+        "row_count": len(rm),
+        "source_invoices": rm["invoice_no"].tolist(),
+    }
+
+
+
+# Q12 (custom): Count + combined taxable value of invoices missing GSTIN
+
+def q12_missing_gstin_value(df: pd.DataFrame) -> dict:
+    rows = df[df["flags"].str.contains("missing_gstin_no_itc")]
+    total = rows["taxable_amount_inr"].fillna(0).sum()
+    return {
+        "count": len(rows),
+        "total_taxable": round(float(total), 2),
+        "source_invoices": rows["invoice_no"].tolist(),
+    }
+
+
 def main():
     df = load_clean()
     print(f"Loaded {len(df)} cleaned rows from {DATA_DIR / 'ledger_clean.csv'}\n")
@@ -242,6 +301,26 @@ def main():
     for row in r["flagged_rows"]:
         print(f"    {row}")
     print(f"  Excluded (superseded duplicates): {r['excluded_rows']}")
+
+    print("\n--- Custom questions (Q9-Q12) ---\n")
+
+    print("=== Q9: Total taxable spend FY2024-25 (excl GST, net of CN) ===")
+    r = q9_total_taxable_spend(df)
+    print(f"  Rs. {r['answer']:,} across {r['row_count']} rows\n")
+
+    print("=== Q10: Vendor(s) with most overdue invoices by count ===")
+    r = q10_most_overdue_by_count(df)
+    print(f"  {r['answer_vendors']}: {r['count']} each")
+    print(f"  All counts: {r['all_counts']}\n")
+
+    print("=== Q11: Average taxable amount - Raw Material (excl. credit notes) ===")
+    r = q11_avg_raw_material(df)
+    print(f"  Rs. {r['answer']:,} across {r['row_count']} invoices\n")
+
+    print("=== Q12: Invoices missing GSTIN - count and combined taxable value ===")
+    r = q12_missing_gstin_value(df)
+    print(f"  Count: {r['count']}, Total taxable: Rs. {r['total_taxable']:,}")
+    print(f"  {r['source_invoices']}")
 
 
 if __name__ == "__main__":
