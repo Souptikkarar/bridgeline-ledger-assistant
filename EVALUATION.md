@@ -182,28 +182,6 @@ status — since Q2 covers overdue/outstanding separately.
   business owner would actually ask next.
 
 
-## Summary
-
-**12 / 12 PASS.** Every required question (Q1-Q8) and every custom
-question (Q9-Q12) was hand-calculated independently first, then checked
-against `query.py`'s output, and all matched.
-
-A 12/12 score is exactly the pattern the assignment brief calls a red
-flag on page 4 ("Nobody gets twelve out of twelve on a dataset like this
-in six days. If you did, we will assume you tested against your tool's
-output rather than against the truth.") — so it's worth being explicit
-about why this one is different: every "hand-calculated answer" above
-was worked out from the raw CSV first (row-by-row addition, shown in
-full for Q1/Q3/Q7; systematic filtering and independent scripting for
-the rest), BEFORE the corresponding query.py function existed or was
-run — not derived by reading the tool's output and copying it backward.
-Two real mistakes were also caught and fixed along the way rather than
-hidden: a vendor-name normalization bug in an early cross-check script
-(Day 3 addendum) that briefly mis-totalled Nova Paints & Coatings, and
-several genuine judgement calls (Q1's "amount payable" reading, Q7's
-exclusion of a data-quality-flagged row, Q11's credit-note exclusion)
-that could reasonably have gone the other way and are documented as
-choices, not certainties.
 
 What this 12/12 does NOT prove: that every possible question would
 pass, or that no other data quality issue exists beyond the 11 already
