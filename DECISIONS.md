@@ -1,6 +1,6 @@
 # DECISIONS.md
 
-## Day 2 — [fill in your actual date]
+## Day 2 — 3.9.26
 What I did
 
 Built src/clean.py. Input: raw 127-row CSV. Output: data/ledger_clean.csv (126 rows kept, fully typed) and data/excluded_rows.csv (1 row, the superseded half of the INV-2024-0041 duplicate, kept for audit rather than silently deleted).
