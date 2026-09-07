@@ -124,5 +124,5 @@ scoring criterion. Examples of the kind of thing to note honestly:
   test, not an accuracy test). Still worth being honest that a thin
   prompt fails even on an easy question — it shows the descriptions in
   the real prompt are doing real work, not just padding.
-- [Add your actual accuracy comparison results here once you've run
-  the same set of real questions through main.py with each model.]
+
+
