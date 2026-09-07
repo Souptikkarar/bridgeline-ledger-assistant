@@ -217,3 +217,66 @@ average invoice value) that both the hand-calc and the function now make
 the same way, and it's documented rather than left implicit in the code.
 
 Full result: 12/12 PASS across required + custom questions. 
+
+
+Day 4 — 5.9.26
+What I did
+
+Installed Ollama, pulled two models, and built src/main.py — the actual CLI entrypoint. Also wrote src/benchmark.py to measure real tokens/sec for MODEL_NOTES.md.
+
+Architecture
+
+Kept the Day 1 rule intact: the LLM never does arithmetic. Its only two jobs are (1) classify an English question into one of 12 fixed intent names and pull out parameters like a vendor name, and (2) phrase an already-computed result as a sentence. Both are validated by Python before being trusted:
+
+Intent classification: the LLM must return JSON naming one of 12 exact intent strings. If it names anything else, or returns invalid JSON, or the JSON parse fails, Python does NOT guess — it falls back to a plain keyword matcher instead of trusting a malformed response.
+Vendor names: the LLM's extracted vendor string is never used directly — Python snaps it to the nearest real canonical vendor name via a substring match against the known list. This stops the LLM from quietly sending a hallucinated or misspelled vendor name into a query that would then return zero results with no explanation.
+Answer phrasing: the LLM is given the ALREADY-COMPUTED result as JSON and explicitly told not to recalculate anything. This is a prompt-level safeguard, not a hard guarantee — a very small model could still ignore the instruction and restate a wrong number. Worth stress-testing this specifically on Day 5 rather than assuming the instruction is obeyed.
+No-LLM fallback (hardware note, page 5)
+
+If Ollama isn't reachable at localhost:11434, main.py detects this at startup and runs in a reduced mode: keyword-based intent matching instead of LLM classification, and prints the raw structured result instead of an LLM-phrased sentence. Tested this path directly (Ollama isn't installed in the environment I used to draft this code) and confirmed Q1 and Q2 both still return correct, fully-sourced answers with zero LLM involvement. This means a customer machine that genuinely cannot run any model is not left with nothing — it just loses the plain-English phrasing layer, not the underlying correctness.
+
+What I have NOT yet done
+Have not yet run the real end-to-end flow WITH Ollama actually answering questions on my own machine - the keyword-fallback path is verified, the LLM path is written but not yet exercised against a real model. This is the first thing to do before writing anything in MODEL_NOTES.md.
+Have not yet stress-tested what happens when the LLM ignores the "don't recalculate" instruction in the phrasing step - need a couple of adversarial test questions to see if a small model invents a number instead of using the one provided.
+MODEL_NOTES.md is a skeleton with real questions but no real numbers yet - filling it in is tomorrow's first task, using benchmark.py.
+Blocking
+
+Nothing blocking, but the honest state of this repo right now is: the Python core (Day 1-3) is fully verified; the LLM layer (Day 4) is written and its fallback path is verified, but the LLM-in-the-loop path itself has not been run yet on real hardware with a real model.
+
+Tomorrow
+
+Run main.py for real with both models. Try to break it (ambiguous questions, questions with no matching intent, a vendor name typo) and record what actually happens, not what I expect to happen. Fill in MODEL_NOTES.md with real measurements. Update EVALUATION.md's Q9-Q12 "Tool's answer" to reflect the actual CLI output, not just query.py called directly.
+
+Day 5 — 6.9.26
+What I did
+
+[Fill this in based on what you actually found running main.py with real questions against both models, the ollama ps / ollama show output, and whichever accuracy differences you saw between qwen2.5:3b and phi3:mini. Update EVALUATION.md's Q9-Q12 "Tool's answer" to reflect the real CLI output rather than query.py called directly, and note honestly if the LLM changed any of the 12/12 PASS results from Day 3.]
+
+Blocking
+
+[...]
+
+Tomorrow
+
+Day 6: write README.md (done, see repo root), AI_USAGE.md (done), and do a final honesty pass across every doc before submitting.
+
+Day 6 — 7.9.26
+What I did
+
+Wrote README.md (install + run in 5 commands, folder structure, no-LLM mode explained) and AI_USAGE.md (how Claude was used each day, most useful prompt, and a real bug it introduced and I caught - a vendor-name normalization bug in an independent cross-check script, documented in full in the Day 3 addendum above).
+
+Final honesty pass
+
+Before submitting, went back through every doc and checked:
+
+Does EVALUATION.md's 12/12 still reflect reality after Day 5's real LLM-in-the-loop testing, or did I need to walk anything back? [answer honestly here based on what actually happened]
+Does MODEL_NOTES.md contain only numbers I personally measured on my own machine, with no copied benchmark figures?
+Does every "PASS" in EVALUATION.md correspond to an answer I actually hand-calculated myself from the raw file, not one I accepted because the tool and a script agreed with each other?
+Is there anything in this repo I'm overclaiming? [If there is, say so here rather than at the call - a self-caught overclaim reads far better than one Rajesh has to find himself.]
+What I know is still weak or incomplete
+
+[Be specific and honest here - e.g. limited adversarial testing of the LLM layer, no automated tests, Q8's "did I find everything" is fundamentally unfalsifiable from inside my own tool, etc.]
+
+Submitted
+
+Repository: [your GitHub URL] Final commit: [hash or just "see git log"]
