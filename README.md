@@ -57,7 +57,7 @@ vendor Payment/
 ├── EVALUATION.md
 ├── MODEL_NOTES.md
 ├── AI_USAGE.md
-└── README.md             (this file)
+└── README.md           
 ```
 
 ## No-LLM mode
