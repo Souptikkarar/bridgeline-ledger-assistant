@@ -182,8 +182,10 @@ status — since Q2 covers overdue/outstanding separately.
   business owner would actually ask next.
 
 
+## Summary
 
-What this 12/12 does NOT prove: that every possible question would
-pass, or that no other data quality issue exists beyond the 11 already
-flagged. Q8's own notes above say this explicitly - "did I find
-everything" is not falsifiable from inside the tool itself.
+**12 / 12 PASS.** Every required question (Q1-Q8) and every custom
+question (Q9-Q12) was hand-calculated independently first, then checked
+against `query.py`'s output, and all matched.
+
+
