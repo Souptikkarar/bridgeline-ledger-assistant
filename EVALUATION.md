@@ -1,9 +1,6 @@
 # EVALUATION.md
 
 
-
-
-
 ## Q1: Total amount payable to Bharat Steel Works for FY 2024-25
 
 **Assumption stated:** "amount payable" read as total invoiced value for the
